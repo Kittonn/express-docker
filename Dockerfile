@@ -1,19 +1,17 @@
-FROM node:20-alpine AS deps
+FROM node:20-alpine As base
 
 USER node
 WORKDIR /usr/app
 
 COPY --chown=node:node package*.json .
+
+FROM base AS deps
 
 RUN npm install
 
-FROM node:20-alpine As build
-
-USER node
-WORKDIR /usr/app
+FROM base As build
 
 COPY --chown=node:node . .
-COPY --chown=node:node package*.json .
 COPY --chown=node:node --from=deps /usr/app/node_modules ./node_modules
 
 RUN npm run build
